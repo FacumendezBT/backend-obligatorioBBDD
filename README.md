@@ -23,3 +23,9 @@ $ source ./bin/activate # En Mac/Linux
 C:\> .\Scripts\activate.bat :: En Windows
 ```  
 
+# Para levantar el programa  
+
+```
+$ fastapi dev src/main.py
+```  
+
