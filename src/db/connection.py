@@ -7,7 +7,7 @@ from src.config import db_config
  Date: 2021-10-18
  """
 class Connection:
-    def __init__(self: object, passwd: str) -> object:
+    def __init__(self: object) -> object:
         try:
             self.cnx = mysql.connector.connect(
                 user=db_config.USER_BD,
