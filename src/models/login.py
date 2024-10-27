@@ -6,14 +6,14 @@ from models.generic_model import GenericModel
 
 
 class Login(GenericModel):
-    table_name = "login"
+    table = "login"
 
-    def __init__(self: object, mail: str, password: str) -> None:
+    def __init__(self, mail: str, password: str) -> None:
         super.__init__()
         self.correo = mail
         self.contrasena = password
 
-    def insert_row(self: object, row: dict):
+    def insert_row(self, row: dict):
         # TODO hacer chequeos de la entrada
 
         super().insert_row(row)

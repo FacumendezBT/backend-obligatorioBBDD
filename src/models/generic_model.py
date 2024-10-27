@@ -3,9 +3,9 @@ from src.config import db_config
 
 
 class GenericModel:
-    table_name = ""
+    table = "" # Cada model hace override
 
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         try:
             self.cnx = mysql.connector.connect(
                 user=db_config.USER_BD,
@@ -19,25 +19,36 @@ class GenericModel:
         else:
             self.msg = "OK"
 
-    def end_connection(self: object):
+    # Cortamos la conexión cuando se va del scope
+    # ...o cuando se le cante al garbage collector
+    # Si hay drama podemos cambiar a un context manager
+    def __del__(self) -> None:
         self.cursor.close()
         self.cnx.close()
 
-    def insert_row(self: object, row: dict):
-        # Afanado de https://dev.mysql.com/doc/connector-python/
+    # Este método tiene bastante funcionalidad implementada. La idea es que
+    # cada clase haga override para agregar los chequeos necesarios y luego
+    # llamen al método del padre.
+    def insert_row(self, row: dict) -> None:
+        # Docs: https://dev.mysql.com/doc/connector-python/
         # en/connector-python-example-cursor-transaction.html
         columns = ", ".join(list(row.keys()))
         placeholder = ", ".join([f"%({key})s" for key in row.keys()])
 
-        query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholder})"
+        query = f"INSERT INTO {self.table} ({columns}) VALUES ({placeholder})"
 
-        self.cursor.execute(query, row)
-        self.curso.commit()
+        try:
+            self.cursor.execute(query, row)
+        except mysql.connector.Error as err:
+            self.msg = err
+            self.cnx.rollback() # Si revienta cancelamos la transacción.
+        else:
+            self.cnx.commit()
+
+
+    def update_row(self, new_attributes: dict) -> None:
+        pass
 
     @classmethod
     def map_result(model: object, result_row: dict) -> None:
         pass
-
-    @classmethod
-    def update_row(model: object, params: dict) -> None:
-        return None
