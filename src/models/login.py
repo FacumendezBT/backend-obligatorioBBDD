@@ -1,23 +1,37 @@
-"""
-Description: This class represents a tuple of the login(...) table in the database.
-"""
-
 from models.generic_model import GenericModel
 
 
 class Login(GenericModel):
-    table = "login"
+    table: str = "login"
 
-    def __init__(self, mail: str, password: str) -> None:
+    correo: str = None
+    contrasena: str = None
+
+    def __init__(self) -> None:
         super.__init__()
-        self.correo = mail
-        self.contrasena = password
 
-    def insert_row(self, row: dict):
-        # TODO hacer chequeos de la entrada
+    def get_row(self, prim_keys: dict) -> None:
+        super().get_row(prim_keys)
+        result: dict = self.cursor.fetchone()
 
-        super().insert_row(row)
+        if result:
+            self.correo = result["correo"]
+            self.contrasena = result["contrasena"]
+        else:
+            # Anulamos x si estuviéramos reutilizando una
+            # misma instancia para hacer los select
+            self.correo = None
+            self.contrasena = None
 
-    @classmethod
-    def map_result(cls: object, result_row: dict) -> object:
-        return cls(result_row["correo"], result_row["contrasena"])
+    def insert_row(self, row: dict) -> bool:
+        try:
+            # Chequeo bien bobo
+            if type(row["correo"]) is not str and type(row["contrasena"]) is not str:
+                self.msg = "TYPE ERROR"
+                return False
+
+        except KeyError:
+            self.msg = "INVALID ATTRIBUTES"
+            return False
+
+        return super().insert_row(row)
