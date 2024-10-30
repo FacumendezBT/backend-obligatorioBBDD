@@ -8,9 +8,18 @@ $ python -m venv .
 
 ## Instalar dependencias  
 
+Mac/Linux:  
+
 ```
 $ ./bin/pip install mysql-connector-python
 $ ./bin/pip install "fastapi[standard]"
+```  
+
+Windows:  
+
+```
+$ .\Scripts\pip install mysql-connector-python
+$ .\Scripts\pip install "fastapi[standard]"
 ```  
 
 ## Extras  
