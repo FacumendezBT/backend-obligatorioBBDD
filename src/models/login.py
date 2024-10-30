@@ -1,37 +1,58 @@
 from models.generic_model import GenericModel
+from db import ConnectionContext
 
 
 class Login(GenericModel):
     table: str = "login"
+    correo: str
+    contrasena: str
+    is_new: bool
 
-    correo: str = None
-    contrasena: str = None
-
-    def __init__(self) -> None:
+    def __init__(self, correo, contrasena, is_new) -> None:
         super.__init__()
+        self.correo = correo
+        self.contrasena = contrasena
+        self.is_new = is_new
 
-    def get_row(self, prim_keys: dict) -> None:
-        super().get_row(prim_keys)
-        result: dict = self.cursor.fetchone()
+    @classmethod
+    def get_all(cls) -> list[object]:
+        with ConnectionContext() as connection:
+            result: dict = connection.get_row(cls.table)
 
-        if result:
-            self.correo = result["correo"]
-            self.contrasena = result["contrasena"]
-        else:
-            # Anulamos x si estuviéramos reutilizando una
-            # misma instancia para hacer los select
-            self.correo = None
-            self.contrasena = None
+            if not result:
+                return []
 
-    def insert_row(self, row: dict) -> bool:
-        try:
-            # Chequeo bien bobo
-            if type(row["correo"]) is not str and type(row["contrasena"]) is not str:
-                self.msg = "TYPE ERROR"
-                return False
+            return [Login(row["correo"], row["contrasena"], False) for row in result]
 
-        except KeyError:
-            self.msg = "INVALID ATTRIBUTES"
+    @classmethod
+    def get_row(cls, prim_keys: dict) -> object | None:
+        with ConnectionContext() as connection:
+            result: dict = connection.get_row(cls.table, prim_keys)
+
+            if not result:
+                return None
+
+            return cls(result["correo"], result["contrasena"], False)
+
+    def save(self) -> bool:
+        # Chequeo bien bobo
+        if type(self.correo) is not str and type(self.contrasena) is not str:
             return False
 
-        return super().insert_row(row)
+        with ConnectionContext() as connection:
+            if self.is_new:
+                connection.insert_row(
+                    self.table, {"correo": self.correo, "contrasena": self.contrasena}
+                )
+            else:
+                connection.update_row(
+                    self.table,
+                    {"correo": self.correo, "contrasena": self.contrasena},
+                    {"correo": self.correo},
+                )
+
+    def delete_self(self) -> bool:
+        with ConnectionContext() as connection:
+            if connection.delete_row(self.table, {"correo": self.correo}):
+                self.correo = None
+                self.contrasena = None
