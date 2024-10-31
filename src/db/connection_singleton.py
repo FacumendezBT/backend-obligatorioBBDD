@@ -32,11 +32,9 @@ class ConnectionSingleton:
 
         return cls.this
 
-    def __enter__(self) -> object:
-        return self.get_instance()
-
-    def __exit__(self) -> None:
-        pass
+    def disconnect(self) -> None:
+        self.cursor.close()
+        self.cnx.close()
 
     def _execute(self, query: str, values: dict | None) -> bool:
         try:
