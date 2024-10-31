@@ -4,10 +4,12 @@ from mysql.connector.cursor import MySQLCursorBufferedDict
 from src.config import db_config
 
 
-class ConnectionContext:
+class ConnectionSingleton:
     cnx: MySQLConnection  # Representa una conexión a una base de datos
     cursor: MySQLCursorBufferedDict  # Para ejecutar operaciones en la bd
     msg: str
+
+    this: object = None
 
     def __init__(self) -> None:
         try:
@@ -23,13 +25,18 @@ class ConnectionContext:
         else:
             self.msg = "OK"
 
-    def __enter__(self) -> object:
-        return self
+    @classmethod
+    def get_instance(cls) -> object:
+        if not cls.this:
+            cls.this = cls()
 
-    # Cortamos la conexión cuando se va del scope
+        return cls.this
+
+    def __enter__(self) -> object:
+        return self.get_instance()
+
     def __exit__(self) -> None:
-        self.cursor.close()
-        self.cnx.close()
+        pass
 
     def _execute(self, query: str, values: dict | None) -> bool:
         try:

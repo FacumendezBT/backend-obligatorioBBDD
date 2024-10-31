@@ -1,5 +1,5 @@
 from models.generic_model import GenericModel
-from db import ConnectionContext
+from db import ConnectionSingleton
 
 
 class Login(GenericModel):
@@ -16,43 +16,43 @@ class Login(GenericModel):
 
     @classmethod
     def get_all(cls) -> list[object]:
-        with ConnectionContext() as connection:
-            result: dict = connection.get_row(cls.table)
+        connection = ConnectionSingleton().get_instance()
+        result: dict = connection.get_row(cls.table)
 
-            if not result:
-                return []
+        if not result:
+            return []
 
-            return [Login(row["correo"], row["contrasena"], False) for row in result]
+        return [Login(row["correo"], row["contrasena"], False) for row in result]
 
     @classmethod
     def get_row(cls, prim_keys: dict) -> object | None:
-        with ConnectionContext() as connection:
-            result: dict = connection.get_row(cls.table, prim_keys)
+        connection = ConnectionSingleton().get_instance()
+        result: dict = connection.get_row(cls.table, prim_keys)
 
-            if not result:
-                return None
+        if not result:
+            return None
 
-            return cls(result["correo"], result["contrasena"], False)
+        return cls(result["correo"], result["contrasena"], False)
 
     def save(self) -> bool:
         # Chequeo bien bobo
         if type(self.correo) is not str and type(self.contrasena) is not str:
             return False
 
-        with ConnectionContext() as connection:
-            if self.is_new:
-                connection.insert_row(
-                    self.table, {"correo": self.correo, "contrasena": self.contrasena}
-                )
-            else:
-                connection.update_row(
-                    self.table,
-                    {"correo": self.correo, "contrasena": self.contrasena},
-                    {"correo": self.correo},
-                )
+        connection = ConnectionSingleton().get_instance()
+        if self.is_new:
+            connection.insert_row(
+                self.table, {"correo": self.correo, "contrasena": self.contrasena}
+            )
+        else:
+            connection.update_row(
+                self.table,
+                {"correo": self.correo, "contrasena": self.contrasena},
+                {"correo": self.correo},
+            )
 
     def delete_self(self) -> bool:
-        with ConnectionContext() as connection:
-            if connection.delete_row(self.table, {"correo": self.correo}):
-                self.correo = None
-                self.contrasena = None
+        connection = ConnectionSingleton().get_instance()
+        if connection.delete_row(self.table, {"correo": self.correo}):
+            self.correo = None
+            self.contrasena = None

@@ -13,11 +13,8 @@ class GenericModel:
     def get_row(cls, prim_keys: dict) -> None:
         pass
 
-    def insert_row(self, row: dict) -> bool:
+    def save(self) -> bool:
         pass
 
-    def save(self, new_attributes: dict, condition: dict) -> None:
-        pass
-
-    def delete_self(self, condition: dict) -> None:
+    def delete_self(self) -> bool:
         pass
