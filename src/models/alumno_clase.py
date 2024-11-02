@@ -1,18 +1,87 @@
-"""
-Description: This class represents a tuple of the alumno_clase(...) table in the database.
-"""
+from models.alumno import Alumno
+from models.generic_model import GenericModel
+from db import ConnectionSingleton
 
 
 class AlumnoClase:
-    def __init__(self: object, id_clase: int, ci_alumno: int, id_equipamiento: int) -> None:
+    table: str = "alumno_clase"
+    id_clase: int
+    ci_alumno: int
+    id_equipamiento: int
+    is_new: bool
+
+    def __init__(
+        self, id_clase: int, ci_alumno: int, id_equipamiento: int, is_new: bool
+    ) -> None:
         self.id_clase = id_clase
         self.ci_alumno = ci_alumno
         self.id_equipamiento = id_equipamiento
+        self.is_new = is_new
 
     @classmethod
-    def map_result(obj: object, result_row: dict) -> object:
-        return obj(
-            result_row["id_clase"],
-            result_row["ci_alumno"],
-            result_row["id_equipamiento"],
+    def get_all(cls) -> list[object]:
+        connection = ConnectionSingleton().get_instance()
+        result: dict = connection.get_row(cls.table)
+
+        if not result:
+            return []
+
+        return [
+            AlumnoClase(
+                row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
+            )
+            for row in result
+        ]
+
+    @classmethod
+    def get_row(cls, prim_keys: dict) -> object | None:
+        connection = ConnectionSingleton().get_instance()
+        result: dict = connection.get_row(cls.table, prim_keys)
+
+        if not result:
+            return None
+
+        return cls(
+            result["id_clase"], result["ci_alumno"], result["id_equipamiento"], False
         )
+
+    def save(self) -> bool:
+        # Chequeo bien bobo
+        if type(self.id_clase) is not int:
+            return False
+
+        if type(self.ci_alumno) is not int:
+            return False
+
+        if type(self.id_equipamiento) is not int:
+            return False
+
+        connection = ConnectionSingleton().get_instance()
+        if self.is_new:
+            connection.insert_row(
+                self.table,
+                {
+                    "id_clase": self.id_clase,
+                    "ci_alumno": self.ci_alumno,
+                    "id_equipamiento": self.id_equipamiento,
+                },
+            )
+        else:
+            connection.update_row(
+                self.table,
+                {
+                    "id_clase": self.id_clase,
+                    "ci_alumno": self.ci_alumno,
+                    "id_equipamiento": self.id_equipamiento,
+                },
+                {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno},
+            )
+
+    def delete_self(self) -> bool:
+        connection = ConnectionSingleton().get_instance()
+        if connection.delete_row(
+            self.table, {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno}
+        ):
+            self.id_clase = None
+            self.ci_alumno = None
+            self.id_equipamiento = None

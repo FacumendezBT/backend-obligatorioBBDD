@@ -8,7 +8,7 @@ class Login(GenericModel):
     contrasena: str
     is_new: bool
 
-    def __init__(self, correo, contrasena, is_new) -> None:
+    def __init__(self, correo: str, contrasena: str, is_new: bool) -> None:
         super.__init__()
         self.correo = correo
         self.contrasena = contrasena
