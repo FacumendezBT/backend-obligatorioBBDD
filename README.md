@@ -1,6 +1,15 @@
 # Para armar entorno  
 
-## Levantar venv  
+## Con docker
+
+```
+$ docker build -f dockerfile -t <el nombre que menos te guste>
+$ docker run <el nombre que hayas puesto>
+```  
+
+---
+
+## Con venv  
 
 ```
 $ python -m venv .
