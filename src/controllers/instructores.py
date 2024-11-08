@@ -1,8 +1,10 @@
 from config.logger import app_logger as logger
-from fastapi import HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from models.instructor import Instructor
 
+router = APIRouter()
 
+@router.get("/")
 def get_all_instructores() -> list[dict]:
     try:
         instructores = Instructor.get_all()
@@ -11,6 +13,7 @@ def get_all_instructores() -> list[dict]:
         logger.error(f"Error al obtener los instructores: {e}")
         raise HTTPException(status_code=500, detail="Error al obtener los instructores")
 
+@router.get("/{ci}")
 def get_instructor_by_id(ci: int) -> dict:
     try:
         instructor = Instructor.get_row({"ci": ci})
@@ -24,6 +27,7 @@ def get_instructor_by_id(ci: int) -> dict:
         logger.error(f"Error al obtener el instructor por id: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error al obtener el instructor por id")
     
+@router.post("/")
 async def create_instructor(request: Request) -> bool:
     try:    
         instructor = await Instructor.from_request(request, True)
@@ -32,7 +36,8 @@ async def create_instructor(request: Request) -> bool:
     except Exception as e:
         logger.error(f"Error al crear el instructor: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error al crear el instructor")
-    
+
+@router.put("/") 
 async def update_instructor(request: Request) -> bool:
     try:
         instructor = await Instructor.from_request(request, False)
@@ -42,6 +47,7 @@ async def update_instructor(request: Request) -> bool:
         logger.error(f"Error al actualizar el instructor: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error al actualizar el instructor")
     
+@router.delete("/{ci}")
 def delete_instructor(ci: int) -> bool:
     try:
         instructor = Instructor.get_row({"ci": ci})

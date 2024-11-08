@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from routes.instructores import router as instructores_router
+from controllers.instructores import router as instructores_router
 
 app = FastAPI()
 
-app.include_router(instructores_router)
+app.include_router(instructores_router, prefix="/instructores", tags=["Instructores"])
+
