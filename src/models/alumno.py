@@ -1,5 +1,5 @@
 from datetime import date
-from db import ConnectionSingleton
+from db.connection_singleton import ConnectionSingleton
 from models.generic_model import GenericModel
 
 
@@ -12,6 +12,16 @@ class Alumno:
     telefono_contacto: int
     correo_electronico: str
     is_new: bool
+
+    def to_dict(self) -> dict:
+        return {
+            "ci": self.ci,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+            "fecha_nacimiento": self.fecha_nacimiento,
+            "telefono_contacto": self.telefono_contacto,
+            "correo_electronico": self.correo_electronico,
+        }
 
     def __init__(
         self,
@@ -34,7 +44,7 @@ class Alumno:
     @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table)
+        result: dict = connection.get_all(cls.table)
 
         if not result:
             return []
@@ -94,26 +104,12 @@ class Alumno:
         if self.is_new:
             connection.insert_row(
                 self.table,
-                {
-                    "ci": self.ci,
-                    "nombre": self.nombre,
-                    "apellido": self.apellido,
-                    "fecha_nacimiento": self.fecha_nacimiento,
-                    "telefono_contacto": self.telefono_contacto,
-                    "correo_electronico": self.correo_electronico,
-                },
+                self.to_dict(),
             )
         else:
             connection.update_row(
                 self.table,
-                {
-                    "ci": self.ci,
-                    "nombre": self.nombre,
-                    "apellido": self.apellido,
-                    "fecha_nacimiento": self.fecha_nacimiento,
-                    "telefono_contacto": self.telefono_contacto,
-                    "correo_electronico": self.correo_electronico,
-                },
+                self.to_dict(),
                 {"ci": self.ci},
             )
 

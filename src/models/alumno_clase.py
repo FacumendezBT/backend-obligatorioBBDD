@@ -1,6 +1,6 @@
 from models.alumno import Alumno
 from models.generic_model import GenericModel
-from db import ConnectionSingleton
+from db.connection_singleton import ConnectionSingleton
 
 
 class AlumnoClase:
@@ -9,6 +9,13 @@ class AlumnoClase:
     ci_alumno: int
     id_equipamiento: int
     is_new: bool
+
+    def to_dict(self) -> dict:
+        return {
+            "id_clase": self.id_clase,
+            "ci_alumno": self.ci_alumno,
+            "id_equipamiento": self.id_equipamiento,
+        }
 
     def __init__(
         self, id_clase: int, ci_alumno: int, id_equipamiento: int, is_new: bool
@@ -21,7 +28,7 @@ class AlumnoClase:
     @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table)
+        result: dict = connection.get_all(cls.table)
 
         if not result:
             return []
@@ -60,20 +67,12 @@ class AlumnoClase:
         if self.is_new:
             connection.insert_row(
                 self.table,
-                {
-                    "id_clase": self.id_clase,
-                    "ci_alumno": self.ci_alumno,
-                    "id_equipamiento": self.id_equipamiento,
-                },
+                self.to_dict(),
             )
         else:
             connection.update_row(
                 self.table,
-                {
-                    "id_clase": self.id_clase,
-                    "ci_alumno": self.ci_alumno,
-                    "id_equipamiento": self.id_equipamiento,
-                },
+                self.to_dict(),
                 {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno},
             )
 

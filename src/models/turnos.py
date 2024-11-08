@@ -1,5 +1,5 @@
 from models.generic_model import GenericModel
-from db import ConnectionSingleton
+from db.connection_singleton import ConnectionSingleton
 from datetime import time
 
 
@@ -8,6 +8,13 @@ class Turnos(GenericModel):
     hora_inicio: time
     hora_fin: time
     is_new: bool
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "hora_inicio": self.hora_inicio,
+            "hora_fin": self.hora_fin,
+        }
 
     def __init__(
         self, id: int, starting_time: time, ending_time: time, is_new: bool
@@ -20,7 +27,7 @@ class Turnos(GenericModel):
     @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table)
+        result: dict = connection.get_all(cls.table)
 
         if not result:
             return []
@@ -55,20 +62,12 @@ class Turnos(GenericModel):
         if self.is_new:
             connection.insert_row(
                 self.table,
-                {
-                    "id": self.id,
-                    "hora_inicio": self.hora_inicio,
-                    "hora_fin": self.hora_fin,
-                },
+                self.to_dict(),
             )
         else:
             connection.update_row(
                 self.table,
-                {
-                    "id": self.id,
-                    "hora_inicio": self.hora_inicio,
-                    "hora_fin": self.hora_fin,
-                },
+                self.to_dict(),
                 {"id": self.id},
             )
 

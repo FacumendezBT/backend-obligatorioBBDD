@@ -1,5 +1,5 @@
 from models.generic_model import GenericModel
-from db import ConnectionSingleton
+from db.connection_singleton import ConnectionSingleton
 
 
 class Instructor(GenericModel):
@@ -9,6 +9,13 @@ class Instructor(GenericModel):
     apellido: str
     is_new: bool
 
+    def to_dict(self) -> dict:
+        return {
+            "ci": self.ci,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+        }
+
     def __init__(
         self, ci: int, nombre: str, apellido: str, is_new: bool
     ) -> None:
@@ -17,11 +24,12 @@ class Instructor(GenericModel):
         self.nombre = nombre
         self.apellido = apellido
         self.is_new = is_new
+    
 
     @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table)
+        result: dict = connection.get_all(cls.table)
 
         if not result:
             return []
@@ -56,20 +64,12 @@ class Instructor(GenericModel):
         if self.is_new:
             connection.insert_row(
                 self.table,
-                {
-                    "ci": self.ci,
-                    "nombre": self.nombre,
-                    "apellido": self.apellido,
-                },
+                self.to_dict()
             )
         else:
             connection.update_row(
                 self.table,
-                {
-                    "ci": self.ci,
-                    "nombre": self.nombre,
-                    "apellido": self.apellido,
-                },
+                self.to_dict(),
                 {"ci": self.ci},
             )
 

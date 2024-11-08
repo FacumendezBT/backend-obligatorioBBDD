@@ -1,7 +1,7 @@
 import mysql.connector
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursorBufferedDict
-from src.config import db_config
+from config import db_config
 
 
 class ConnectionSingleton:
@@ -53,7 +53,7 @@ class ConnectionSingleton:
     def get_all(self, table: str) -> dict | None:
         query = f"SELECT * FROM {table}"
 
-        if not self._execute(query):
+        if not self._execute(query, None):
             return None
 
         return self.cursor.fetchall()

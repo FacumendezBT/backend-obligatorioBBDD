@@ -1,5 +1,5 @@
 from models.generic_model import GenericModel
-from db import ConnectionSingleton
+from db.connection_singleton import ConnectionSingleton
 
 
 class Login(GenericModel):
@@ -7,6 +7,12 @@ class Login(GenericModel):
     correo: str
     contrasena: str
     is_new: bool
+
+    def to_dict(self) -> dict:
+        return {
+            "correo": self.correo, 
+            "contrasena": self.contrasena
+        }
 
     def __init__(self, correo: str, contrasena: str, is_new: bool) -> None:
         super.__init__()
@@ -17,7 +23,7 @@ class Login(GenericModel):
     @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table)
+        result: dict = connection.get_all(cls.table)
 
         if not result:
             return []
@@ -41,13 +47,11 @@ class Login(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
-                self.table, {"correo": self.correo, "contrasena": self.contrasena}
-            )
+            connection.insert_row(self.table, self.to_dict())
         else:
             connection.update_row(
                 self.table,
-                {"correo": self.correo, "contrasena": self.contrasena},
+                self.to_dict(),
                 {"correo": self.correo},
             )
 
