@@ -1,6 +1,10 @@
 .env
 .idea
--vscode
-bin include lib lib64
-_pycache_
-pyvenv. cfg|
+.vscode
+bin
+include
+lib
+lib64
+__pycache__
+pyvenv.cfg
+Scripts

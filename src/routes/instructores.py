@@ -1,12 +1,11 @@
-from typing import List
-from fastapi import APIRouter, HTTPException
-from src.pydantic.instructores import Instructor
-from src.controllers.instructores import get_instructores
+from fastapi import APIRouter
+from controller.instructores import get_all_instructores, create_instructor, get_instructor_by_id, update_instructor
 
-PREFIX = "/instructores"
+base_path = "/instructores"
 router = APIRouter()
 
-
-@router.get(PREFIX, response_model=List[Instructor])
-def get_instructores():
-    return get_instructores()
+router.post(base_path)(create_instructor)
+router.get(base_path)(get_all_instructores)
+router.get(f"{base_path}/{{instructor_id}}")(get_instructor_by_id)
+router.put(f"{base_path}/{{instructor_id}}")(update_instructor)
+router.delete(f"{base_path}/{{instructor_id}}")(update_instructor)
