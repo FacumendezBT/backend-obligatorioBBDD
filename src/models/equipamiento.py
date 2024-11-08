@@ -1,3 +1,4 @@
+from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 
@@ -26,6 +27,17 @@ class Equipamiento(GenericModel):
         self.descripcion = descripcion
         self.costo = costo
         self.is_new = is_new
+
+    @classmethod
+    async def from_request(cls, request: Request, is_new: bool) -> object:
+        data = await request.json()
+        return Equipamiento(
+            data.get("id"),
+            data.get("id_actividad"),
+            data.get("descripcion"),
+            data.get("costo"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -78,12 +90,12 @@ class Equipamiento(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},

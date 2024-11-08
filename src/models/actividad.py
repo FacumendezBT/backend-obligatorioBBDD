@@ -1,3 +1,4 @@
+from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 
@@ -32,6 +33,17 @@ class Actividad(GenericModel):
         self.restricion_edad = age_restrict
         self.is_new = is_new
 
+    @classmethod
+    async def from_request(self, request: Request, is_new: bool) -> object:
+        data = await request.json()
+        return Actividad(
+            data.get("id"),
+            data.get("descripcion"),
+            data.get("costo"),
+            data.get("restricion_edad"),
+            is_new,
+        )
+        
     @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
@@ -83,17 +95,17 @@ class Actividad(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},
             )
-
+        
     def delete_self(self) -> bool:
         connection = ConnectionSingleton().get_instance()
         if connection.delete_row(self.table, {"id": self.id}):

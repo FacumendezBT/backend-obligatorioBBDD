@@ -1,12 +1,13 @@
 import mysql.connector
+from config.logger import db_logger as logger
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursorBufferedDict
 from config import db_config
 
 
 class ConnectionSingleton:
-    cnx: MySQLConnection  # Representa una conexión a una base de datos
-    cursor: MySQLCursorBufferedDict  # Para ejecutar operaciones en la bd
+    cnx: MySQLConnection
+    cursor: MySQLCursorBufferedDict
     msg: str
 
     this: object = None
@@ -22,6 +23,7 @@ class ConnectionSingleton:
             self.cursor = self.cnx.cursor(buffered=True, dictionary=True)
         except mysql.connector.Error as err:
             self.msg = err
+            logger.error(err)
         else:
             self.msg = "OK"
 
@@ -39,14 +41,18 @@ class ConnectionSingleton:
     def _execute(self, query: str, values: dict | None) -> bool:
         try:
             if values:
+                logger.info(f"Executing query: {query} with values: {values}")
                 self.cursor.execute(query, values)
             else:
+                logger.info(f"Executing query: {query}")
                 self.cursor.execute(query)
         except mysql.connector.Error as err:
             self.msg = err
             self.cnx.rollback()
+            logger.error(err)
             return False
         else:
+            logger.info("Query executed successfully")
             self.cnx.commit()
             return True
 
@@ -88,7 +94,7 @@ class ConnectionSingleton:
             [f"{key} = %({key})s" for key in prim_keys.keys()]
         )
 
-        query = f"UPDATE {table} SET ({placeholder}) WHERE ({condition_placeholder})"
+        query = f"UPDATE {table} SET {placeholder} WHERE {condition_placeholder}"
 
         if not self._execute(query, {**new_attributes, **prim_keys}):
             return False

@@ -1,4 +1,6 @@
 from datetime import date
+
+from fastapi import Request
 from db.connection_singleton import ConnectionSingleton
 from models.generic_model import GenericModel
 
@@ -40,6 +42,19 @@ class Alumno:
         self.telefono_contacto = telefono_contacto
         self.correo_electronico = correo_electronico
         self.is_new = is_new
+
+    @classmethod
+    async def from_request(cls, request: Request, is_new: bool) -> object:
+        data = await request.json()
+        return Alumno(
+            data.get("ci"),
+            data.get("nombre"),
+            data.get("apellido"),
+            data.get("fecha_nacimiento"),
+            data.get("telefono_contacto"),
+            data.get("correo_electronico"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -102,12 +117,12 @@ class Alumno:
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"ci": self.ci},

@@ -1,3 +1,4 @@
+from fastapi import Request
 from models.alumno import Alumno
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
@@ -24,6 +25,16 @@ class AlumnoClase:
         self.ci_alumno = ci_alumno
         self.id_equipamiento = id_equipamiento
         self.is_new = is_new
+
+    @classmethod
+    async def from_request(self, request: Request, is_new: bool) -> object:
+        data = await request.json()
+        return AlumnoClase(
+            data.get("id_clase"),
+            data.get("ci_alumno"),
+            data.get("id_equipamiento"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -65,12 +76,12 @@ class AlumnoClase:
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno},
