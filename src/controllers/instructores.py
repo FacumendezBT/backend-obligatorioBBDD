@@ -1,6 +1,5 @@
 from base_controller.base_controller import BaseController
-from config.logger import app_logger as logger
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Request
 from models.instructor import Instructor
 
 router = APIRouter()
