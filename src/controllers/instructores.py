@@ -1,63 +1,32 @@
+from base_controller.base_controller import BaseController
 from config.logger import app_logger as logger
 from fastapi import APIRouter, HTTPException, Request
 from models.instructor import Instructor
 
 router = APIRouter()
+controller = BaseController()
+
 
 @router.get("/")
 def get_all_instructores() -> list[dict]:
-    try:
-        instructores = Instructor.get_all()
-        return [instructor.to_dict() for instructor in instructores]
-    except Exception as e:
-        logger.error(f"Error al obtener los instructores: {e}")
-        raise HTTPException(status_code=500, detail="Error al obtener los instructores")
+    return controller.get_all(Instructor)
+
 
 @router.get("/{ci}")
 def get_instructor_by_id(ci: int) -> dict:
-    try:
-        instructor = Instructor.get_row({"ci": ci})
-        if(instructor is None):
-            raise HTTPException(status_code=404, detail="Instructor no encontrado")
-        return instructor.to_dict()
-    except HTTPException as http_exc:
-        logger.warning(f"HTTP error al obtener el instructor por id: {http_exc.detail}")
-        raise http_exc
-    except Exception as e:
-        logger.error(f"Error al obtener el instructor por id: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Error al obtener el instructor por id")
-    
+    return controller.get_by_primkeys(Instructor, {"ci": ci})
+
+
 @router.post("/")
 async def create_instructor(request: Request) -> bool:
-    try:    
-        instructor = await Instructor.from_request(request, True)
-        success = instructor.save()
-        return success
-    except Exception as e:
-        logger.error(f"Error al crear el instructor: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Error al crear el instructor")
+    return await controller.create_from_request(Instructor, request)
 
-@router.put("/") 
+
+@router.put("/")
 async def update_instructor(request: Request) -> bool:
-    try:
-        instructor = await Instructor.from_request(request, False)
-        success = instructor.save()
-        return success
-    except Exception as e:
-        logger.error(f"Error al actualizar el instructor: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Error al actualizar el instructor")
-    
+    return await controller.update_from_request(Instructor, request)
+
+
 @router.delete("/{ci}")
 def delete_instructor(ci: int) -> bool:
-    try:
-        instructor = Instructor.get_row({"ci": ci})
-        if(instructor is None):
-            raise HTTPException(status_code=404, detail="Instructor no encontrado")
-        success = instructor.delete_self()
-        return success
-    except HTTPException as http_exc:
-        logger.warning(f"HTTP error al eliminar el instructor: {http_exc.detail}")
-        raise http_exc
-    except Exception as e:
-        logger.error(f"Error al eliminar el instructor: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail="Error al eliminar el instructor")
+    return controller.delete_from_primkeys(Instructor, {"ci": ci})
