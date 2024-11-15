@@ -5,6 +5,7 @@ from datetime import time
 
 class Turnos(GenericModel):
     table: str = "turnos"
+    id: int
     hora_inicio: time
     hora_fin: time
     is_new: bool

@@ -7,6 +7,7 @@ controller = BaseController()
 
 # Medio chancho tirar el mail x url
 # Capaz que podemos codificarlo en el front y decodificarlo acá (?)
+# Después está el tema de controlar los logueos. Me imagino que usaremos otra ruta
 @router.get("/")
 def get_all_users() -> list[dict]:
     return controller.get_all(Login)
