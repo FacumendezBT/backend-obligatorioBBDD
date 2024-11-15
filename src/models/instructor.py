@@ -1,4 +1,3 @@
-from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 
@@ -27,12 +26,11 @@ class Instructor(GenericModel):
         self.is_new = is_new
     
     @classmethod
-    async def from_request(cls, request: Request, is_new: bool) -> object:
-        data = await request.json()
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
         return Instructor(
-            data.get("ci"),
-            data.get("nombre"),
-            data.get("apellido"),
+            request_data.get("ci"),
+            request_data.get("nombre"),
+            request_data.get("apellido"),
             is_new,
         )
 

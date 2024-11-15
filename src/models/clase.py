@@ -1,4 +1,3 @@
-from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 from datetime import date
@@ -43,15 +42,14 @@ class Clase(GenericModel):
         self.is_new = is_new
 
     @classmethod
-    async def from_request(cls, request: Request, is_new: bool) -> object:
-        data = await request.json()
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
         return Clase(
-            data.get("id"),
-            data.get("ci_instructor"),
-            data.get("id_actividad"),
-            data.get("id_turno"),
-            data.get("dictada"),
-            data.get("fecha"),
+            request_data.get("id"),
+            request_data.get("ci_instructor"),
+            request_data.get("id_actividad"),
+            request_data.get("id_turno"),
+            request_data.get("dictada"),
+            request_data.get("fecha"),
             is_new,
         )
 

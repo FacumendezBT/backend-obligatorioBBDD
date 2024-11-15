@@ -1,4 +1,3 @@
-from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 
@@ -10,13 +9,13 @@ class Equipamiento(GenericModel):
     descripcion: str
     costo: int
     is_new: bool
-    
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "id_actividad": self.id_actividad,
             "descripcion": self.descripcion,
-            "costo": self.costo
+            "costo": self.costo,
         }
 
     def __init__(
@@ -29,13 +28,12 @@ class Equipamiento(GenericModel):
         self.is_new = is_new
 
     @classmethod
-    async def from_request(cls, request: Request, is_new: bool) -> object:
-        data = await request.json()
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
         return Equipamiento(
-            data.get("id"),
-            data.get("id_actividad"),
-            data.get("descripcion"),
-            data.get("costo"),
+            request_data.get("id"),
+            request_data.get("id_actividad"),
+            request_data.get("descripcion"),
+            request_data.get("costo"),
             is_new,
         )
 

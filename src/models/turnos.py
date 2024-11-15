@@ -1,4 +1,3 @@
-from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 from datetime import time
@@ -26,12 +25,11 @@ class Turnos(GenericModel):
         self.hora_fin = ending_time
 
     @classmethod
-    async def from_request(cls, request: Request, is_new: bool) -> object:
-        data = await request.json()
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
         return Turnos(
-            data.get("id"),
-            data.get("hora_inicio"),
-            data.get("hora_fin"),
+            request_data.get("id"),
+            request_data.get("hora_inicio"),
+            request_data.get("hora_fin"),
             is_new,
         )
 

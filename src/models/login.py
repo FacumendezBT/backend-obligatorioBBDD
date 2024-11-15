@@ -1,4 +1,3 @@
-from fastapi import Request
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 
@@ -25,10 +24,12 @@ class Login(GenericModel):
         self.is_new = is_new
 
     @classmethod
-    async def from_request(cls, request: Request, is_new: bool) -> object:
-        data = await request.json()
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
         return Login(
-            data.get("correo"), data.get("contrasena"), data.get("admin"), is_new
+            request_data.get("correo"),
+            request_data.get("contrasena"),
+            request_data.get("admin"),
+            is_new,
         )
 
     @classmethod
