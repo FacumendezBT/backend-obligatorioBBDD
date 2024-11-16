@@ -20,7 +20,6 @@ class Turnos(GenericModel):
     def __init__(
         self, id: int, starting_time: time, ending_time: time, is_new: bool
     ) -> None:
-        super().__init__()
         self.id = id
         self.hora_inicio = starting_time
         self.hora_fin = ending_time

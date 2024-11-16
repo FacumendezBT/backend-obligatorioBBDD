@@ -16,6 +16,7 @@ def get_all_alumnos() -> list[dict]:
 def get_alumno_by_id(ci: int) -> dict:
     return controller.get_by_primkeys(Alumno, {"ci": ci})
 
+
 @router.get("/{ci}/clases")
 def get_clases_of_alumno(ci: int) -> list:
     return controller.get_by_attr(AlumnoClase, {"ci_alumno": ci})

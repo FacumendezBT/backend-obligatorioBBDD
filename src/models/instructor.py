@@ -19,7 +19,6 @@ class Instructor(GenericModel):
     def __init__(
         self, ci: int, nombre: str, apellido: str, is_new: bool
     ) -> None:
-        super().__init__()
         self.ci = ci
         self.nombre = nombre
         self.apellido = apellido

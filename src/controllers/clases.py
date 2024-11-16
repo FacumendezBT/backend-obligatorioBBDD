@@ -1,6 +1,7 @@
 from base_controller.base_controller import BaseController
 from fastapi import APIRouter, Request
 from models.clase import Clase
+from models.alumno_clase import AlumnoClase
 
 router = APIRouter()
 controller = BaseController()
@@ -14,6 +15,11 @@ def get_all_clases() -> list[dict]:
 @router.get("/{id}")
 def get_clase_by_id(id: int) -> dict:
     return controller.get_by_primkeys(Clase, {"id": id})
+
+
+@router.get("/{id}/alumnos")
+def get_alumnos_of_clase(id: int) -> list:
+    return controller.get_by_attr(AlumnoClase, {"id_clase": id})
 
 
 @router.post("/")

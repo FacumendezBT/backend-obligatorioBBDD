@@ -17,7 +17,6 @@ class Login(GenericModel):
         }
 
     def __init__(self, correo: str, contrasena: str, admin: bool, is_new: bool) -> None:
-        super.__init__()
         self.correo = correo
         self.contrasena = contrasena
         self.admin = admin
