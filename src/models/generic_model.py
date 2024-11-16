@@ -16,6 +16,10 @@ class GenericModel:
         pass
 
     @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        pass
+
+    @classmethod
     def from_request(cls, request_data: dict, is_new: bool) -> object:
         pass
 

@@ -14,6 +14,17 @@ class BaseController:
             logger.error(f"{err}: {e}")
             raise HTTPException(status_code=500, detail=err)
 
+    def get_by_attr(self, model: GenericModel, attributes: dict) -> dict:
+        err = f"Error al obtener desde {model.table}"
+        try:
+            collection = model.get_all_with(attributes)
+            return [element.to_dict() for element in collection]
+        except HTTPException as http_exc:
+            logger.warning(f"HTTP {err}: {http_exc.detail}")
+            raise http_exc
+        except Exception as e:
+            logger.error(f"{err} por claves: {e}", exc_info=True)
+
     def get_by_primkeys(self, model: GenericModel, primkeys: dict) -> dict:
         err = f"Error al obtener desde {model.table}"
         try:

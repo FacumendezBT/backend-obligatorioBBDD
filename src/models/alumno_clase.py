@@ -49,6 +49,21 @@ class AlumnoClase(GenericModel):
         ]
 
     @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        connection = ConnectionSingleton().get_instance()
+        result: dict = connection.get_all_with(cls.table, attributes)
+
+        if not result:
+            return []
+
+        return [
+            AlumnoClase(
+                row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
+            )
+            for row in result
+        ]
+
+    @classmethod
     def get_row(cls, prim_keys: dict) -> object | None:
         connection = ConnectionSingleton().get_instance()
         result: dict = connection.get_row(cls.table, prim_keys)

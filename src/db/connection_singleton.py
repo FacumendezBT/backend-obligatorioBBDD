@@ -64,6 +64,17 @@ class ConnectionSingleton:
 
         return self.cursor.fetchall()
 
+    def get_all_with(self, table: str, attributes: dict) -> dict | None:
+        condition_placeholder = " AND ".join(
+            [f"{key} = %({key})s" for key in attributes.keys()]
+        )
+        query = f"SELECT * FROM {table} WHERE {condition_placeholder}"
+
+        if not self._execute(query, attributes):
+            return None
+
+        return self.cursor.fetchall()
+
     def get_row(self, table, prim_keys: dict) -> dict | None:
         condition_placeholder = " AND ".join(
             [f"{key} = %({key})s" for key in prim_keys.keys()]
