@@ -1,13 +1,11 @@
-from base_controller.base_controller import BaseController
+from base_controller.base_controller import BaseController, HTTPException
 from fastapi import APIRouter, Request
 from models.login import Login
+from config.logger import app_logger as logger
 
 router = APIRouter()
 controller = BaseController()
 
-# Medio chancho tirar el mail x url
-# Capaz que podemos codificarlo en el front y decodificarlo acá (?)
-# Después está el tema de controlar los logueos. Me imagino que usaremos otra ruta
 @router.get("/")
 def get_all_users() -> list[dict]:
     return controller.get_all(Login)
@@ -21,6 +19,27 @@ def get_user_by_email(email: str) -> dict:
 @router.post("/")
 async def create_user(request: Request) -> bool:
     return await controller.create_from_request(Login, request)
+
+@router.post("/login")
+async def validate_user(request: Request) -> dict:
+    err = "Invalid credentials."
+    creds = await request.json()
+    user = controller.get_by_primkeys(Login, {"correo": creds.get("correo")})
+
+    try:
+        if creds.get("contrasena") != user.get("contrasena"):
+            raise HTTPException(status_code=401, detail=err)
+
+        return {
+            "correo": user.get("correo"),
+            "admin" : user.get("admin"), 
+            "token" : "", # TO DO
+        }
+
+    except HTTPException as http_exec:
+        logger.warning(f"HTTP {err}: {http_exec.detail}")
+        raise http_exec
+
 
 
 @router.put("/")
