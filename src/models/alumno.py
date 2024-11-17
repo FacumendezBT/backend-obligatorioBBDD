@@ -1,9 +1,10 @@
 from datetime import date
+
 from db.connection_singleton import ConnectionSingleton
 from models.generic_model import GenericModel
 
 
-class Alumno:
+class Alumno(GenericModel):
     table: str = "alumno"
     ci: int
     nombre: str
@@ -40,6 +41,18 @@ class Alumno:
         self.telefono_contacto = telefono_contacto
         self.correo_electronico = correo_electronico
         self.is_new = is_new
+
+    @classmethod
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return Alumno(
+            request_data.get("ci"),
+            request_data.get("nombre"),
+            request_data.get("apellido"),
+            request_data.get("fecha_nacimiento"),
+            request_data.get("telefono_contacto"),
+            request_data.get("correo_electronico"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -102,12 +115,12 @@ class Alumno:
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"ci": self.ci},

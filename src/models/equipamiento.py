@@ -9,13 +9,13 @@ class Equipamiento(GenericModel):
     descripcion: str
     costo: int
     is_new: bool
-    
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "id_actividad": self.id_actividad,
             "descripcion": self.descripcion,
-            "costo": self.costo
+            "costo": self.costo,
         }
 
     def __init__(
@@ -26,6 +26,16 @@ class Equipamiento(GenericModel):
         self.descripcion = descripcion
         self.costo = costo
         self.is_new = is_new
+
+    @classmethod
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return Equipamiento(
+            request_data.get("id"),
+            request_data.get("id_actividad"),
+            request_data.get("descripcion"),
+            request_data.get("costo"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -78,12 +88,12 @@ class Equipamiento(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},

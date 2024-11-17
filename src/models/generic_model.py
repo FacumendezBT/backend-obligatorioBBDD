@@ -1,9 +1,11 @@
 class GenericModel:
     table: str  # Cada model hace override
 
-    def __init__(self) -> None:
+    def to_dict(self) -> dict:
         pass
 
+    def __init__(self) -> None:
+        pass
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -11,6 +13,14 @@ class GenericModel:
 
     @classmethod
     def get_row(cls, prim_keys: dict) -> None:
+        pass
+
+    @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        pass
+
+    @classmethod
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
         pass
 
     def save(self) -> bool:

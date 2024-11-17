@@ -19,12 +19,19 @@ class Instructor(GenericModel):
     def __init__(
         self, ci: int, nombre: str, apellido: str, is_new: bool
     ) -> None:
-        super().__init__()
         self.ci = ci
         self.nombre = nombre
         self.apellido = apellido
         self.is_new = is_new
     
+    @classmethod
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return Instructor(
+            request_data.get("ci"),
+            request_data.get("nombre"),
+            request_data.get("apellido"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -62,12 +69,12 @@ class Instructor(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict()
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"ci": self.ci},
@@ -79,3 +86,5 @@ class Instructor(GenericModel):
             self.ci = None
             self.nombre = None
             self.apellido = None
+            return True
+        return False

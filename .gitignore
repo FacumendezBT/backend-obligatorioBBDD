@@ -8,3 +8,5 @@ lib64
 __pycache__
 pyvenv.cfg
 Scripts
+app.log
+database.log

@@ -5,6 +5,7 @@ from datetime import time
 
 class Turnos(GenericModel):
     table: str = "turnos"
+    id: int
     hora_inicio: time
     hora_fin: time
     is_new: bool
@@ -19,10 +20,18 @@ class Turnos(GenericModel):
     def __init__(
         self, id: int, starting_time: time, ending_time: time, is_new: bool
     ) -> None:
-        super().__init__()
         self.id = id
         self.hora_inicio = starting_time
         self.hora_fin = ending_time
+
+    @classmethod
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return Turnos(
+            request_data.get("id"),
+            request_data.get("hora_inicio"),
+            request_data.get("hora_fin"),
+            is_new,
+        )
 
     @classmethod
     def get_all(cls) -> list[object]:
@@ -60,12 +69,12 @@ class Turnos(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},

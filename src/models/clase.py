@@ -42,6 +42,18 @@ class Clase(GenericModel):
         self.is_new = is_new
 
     @classmethod
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return Clase(
+            request_data.get("id"),
+            request_data.get("ci_instructor"),
+            request_data.get("id_actividad"),
+            request_data.get("id_turno"),
+            request_data.get("dictada"),
+            request_data.get("fecha"),
+            is_new,
+        )
+
+    @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
         result: dict = connection.get_all(cls.table)
@@ -102,12 +114,12 @@ class Clase(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},

@@ -1,9 +1,8 @@
-from models.alumno import Alumno
 from models.generic_model import GenericModel
 from db.connection_singleton import ConnectionSingleton
 
 
-class AlumnoClase:
+class AlumnoClase(GenericModel):
     table: str = "alumno_clase"
     id_clase: int
     ci_alumno: int
@@ -26,9 +25,33 @@ class AlumnoClase:
         self.is_new = is_new
 
     @classmethod
+    def from_request(self, request_data: dict, is_new: bool) -> object:
+        return AlumnoClase(
+            request_data.get("id_clase"),
+            request_data.get("ci_alumno"),
+            request_data.get("id_equipamiento"),
+            is_new,
+        )
+
+    @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
         result: dict = connection.get_all(cls.table)
+
+        if not result:
+            return []
+
+        return [
+            AlumnoClase(
+                row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
+            )
+            for row in result
+        ]
+
+    @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        connection = ConnectionSingleton().get_instance()
+        result: dict = connection.get_all_with(cls.table, attributes)
 
         if not result:
             return []
@@ -65,12 +88,12 @@ class AlumnoClase:
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno},

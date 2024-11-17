@@ -33,6 +33,16 @@ class Actividad(GenericModel):
         self.is_new = is_new
 
     @classmethod
+    def from_request(self, request_data: dict, is_new: bool) -> object:
+        return Actividad(
+            request_data.get("id"),
+            request_data.get("descripcion"),
+            request_data.get("costo"),
+            request_data.get("restricion_edad"),
+            is_new,
+        )
+        
+    @classmethod
     def get_all(cls) -> list[object]:
         connection = ConnectionSingleton().get_instance()
         result: dict = connection.get_all(cls.table)
@@ -83,17 +93,17 @@ class Actividad(GenericModel):
 
         connection = ConnectionSingleton().get_instance()
         if self.is_new:
-            connection.insert_row(
+            return connection.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            connection.update_row(
+            return connection.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},
             )
-
+        
     def delete_self(self) -> bool:
         connection = ConnectionSingleton().get_instance()
         if connection.delete_row(self.table, {"id": self.id}):
