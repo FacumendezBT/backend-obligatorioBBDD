@@ -7,6 +7,7 @@ class Instructor(GenericModel):
     ci: int
     nombre: str
     apellido: str
+    correo_electronico: str
     is_new: bool
 
     def to_dict(self) -> dict:
@@ -14,14 +15,16 @@ class Instructor(GenericModel):
             "ci": self.ci,
             "nombre": self.nombre,
             "apellido": self.apellido,
+            "correo_electronico": self.correo_electronico,
         }
 
     def __init__(
-        self, ci: int, nombre: str, apellido: str, is_new: bool
+        self, ci: int, nombre: str, apellido: str, correo_electronico: str, is_new: bool
     ) -> None:
         self.ci = ci
         self.nombre = nombre
         self.apellido = apellido
+        self.correo_electronico = correo_electronico
         self.is_new = is_new
     
     @classmethod
@@ -30,6 +33,7 @@ class Instructor(GenericModel):
             request_data.get("ci"),
             request_data.get("nombre"),
             request_data.get("apellido"),
+            request_data.get("correo_electronico"),
             is_new,
         )
 
@@ -42,7 +46,7 @@ class Instructor(GenericModel):
             return []
 
         return [
-            Instructor(row["ci"], row["nombre"], row["apellido"], False)
+            Instructor(row["ci"], row["nombre"], row["apellido"], row["correo_electronico"], False)
             for row in result
         ]
 
@@ -54,7 +58,7 @@ class Instructor(GenericModel):
         if not result:
             return None
 
-        return cls(result["ci"], result["nombre"], result["apellido"], False)
+        return cls(result["ci"], result["nombre"], result["apellido"], result["correo_electronico"], False)
 
     def save(self) -> bool:
         # Chequeo bien bobo
@@ -65,6 +69,9 @@ class Instructor(GenericModel):
             return False
 
         if type(self.apellido) is not str:
+            return False
+
+        if type(self.correo_electronico) is not str:
             return False
 
         connection = ConnectionSingleton().get_instance()
@@ -86,5 +93,6 @@ class Instructor(GenericModel):
             self.ci = None
             self.nombre = None
             self.apellido = None
+            self.correo_electronico = None
             return True
         return False

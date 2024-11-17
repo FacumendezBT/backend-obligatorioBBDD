@@ -3,9 +3,11 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 import jwt
 
-SECRET_KEY = "eleze"
-ALGORITHM = "HS256"
-EXCLUDED_PATHS = ["/api/users/login", "/api/users/register"]
+from utils.token import SECRET_KEY
+from utils.token import ALGORITHM
+
+EXCLUDED_PATHS = ["/api/users/login"]
+
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
