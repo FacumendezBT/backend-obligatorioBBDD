@@ -1,4 +1,4 @@
-from jose import jwt
+import jwt
 from datetime import datetime, timedelta
 # from config import db_config
 from db.connection_singleton import ConnectionSingleton
