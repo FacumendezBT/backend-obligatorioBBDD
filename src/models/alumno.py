@@ -1,6 +1,6 @@
 from datetime import date
 
-from db.connection_singleton import ConnectionSingleton
+from db import DatabaseConnection
 from models.generic_model import GenericModel
 
 
