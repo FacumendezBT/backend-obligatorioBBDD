@@ -1,6 +1,5 @@
 from models.generic_model import GenericModel
-from db.connection_singleton import ConnectionSingleton
-
+from db.database_connection import DatabaseConnection
 
 class Equipamiento(GenericModel):
     table: str = "equipamiento"
@@ -29,7 +28,7 @@ class Equipamiento(GenericModel):
 
     @classmethod
     def from_request(cls, request_data: dict, is_new: bool) -> object:
-        return Equipamiento(
+        return cls(
             request_data.get("id"),
             request_data.get("id_actividad"),
             request_data.get("descripcion"),
@@ -39,14 +38,14 @@ class Equipamiento(GenericModel):
 
     @classmethod
     def get_all(cls) -> list[object]:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_all(cls.table)
+        db = DatabaseConnection()
+        result = db.get_all(cls.table)
 
         if not result:
             return []
 
         return [
-            Equipamiento(
+            cls(
                 row["id"],
                 row["id_actividad"],
                 row["descripcion"],
@@ -57,9 +56,9 @@ class Equipamiento(GenericModel):
         ]
 
     @classmethod
-    def get_row(cls, prim_keys: dict) -> None:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table, prim_keys)
+    def get_row(cls, prim_keys: dict) -> object | None:
+        db = DatabaseConnection()
+        result = db.get_row(cls.table, prim_keys)
 
         if not result:
             return None
@@ -73,36 +72,39 @@ class Equipamiento(GenericModel):
         )
 
     def save(self) -> bool:
-        # Chequeo bien bobo
-        if type(self.id) is not int:
+        # Validaciones básicas
+        if not isinstance(self.id, int):
             return False
 
-        if type(self.id_actividad) is not int:
+        if not isinstance(self.id_actividad, int):
             return False
 
-        if type(self.descripcion) is not str:
+        if not isinstance(self.descripcion, str):
             return False
 
-        if type(self.costo) is not int:
+        if not isinstance(self.costo, int):
             return False
 
-        connection = ConnectionSingleton().get_instance()
+        db = DatabaseConnection()
         if self.is_new:
-            return connection.insert_row(
+            success = db.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            return connection.update_row(
+            success = db.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},
             )
+        return success
 
     def delete_self(self) -> bool:
-        connection = ConnectionSingleton().get_instance()
-        if connection.delete_row(self.table, {"id": self.id}):
+        db = DatabaseConnection()
+        success = db.delete_row(self.table, {"id": self.id})
+        if success:
             self.id = None
             self.id_actividad = None
             self.descripcion = None
             self.costo = None
+        return success

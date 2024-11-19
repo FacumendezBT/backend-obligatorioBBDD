@@ -6,11 +6,11 @@ from controllers.clases import router as clases_router
 from controllers.users import router as users_router
 from middlewares.auth import AuthMiddleware
 from contextlib import asynccontextmanager
-from db import ConnectionPool
+from db.connection_pool import ConnectionPool
 
 # Como no puedo usar mas los eventos hay que usarlo así, es medio feo pero es lo que hay
 @asynccontextmanager
-async def lifespan():
+async def lifespan(app: FastAPI):
     ConnectionPool.init()
     yield
     ConnectionPool.shutdown()

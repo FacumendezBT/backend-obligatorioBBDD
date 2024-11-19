@@ -1,5 +1,5 @@
 from models.generic_model import GenericModel
-from db.connection_singleton import ConnectionSingleton
+from db.database_connection import DatabaseConnection
 
 
 class Login(GenericModel):
@@ -24,7 +24,7 @@ class Login(GenericModel):
 
     @classmethod
     def from_request(cls, request_data: dict, is_new: bool) -> object:
-        return Login(
+        return cls(
             request_data.get("correo"),
             request_data.get("contrasena"),
             request_data.get("admin"),
@@ -33,49 +33,65 @@ class Login(GenericModel):
 
     @classmethod
     def get_all(cls) -> list[object]:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_all(cls.table)
+        db = DatabaseConnection()
+        result = db.get_all(cls.table)
 
         if not result:
             return []
 
         return [
-            Login(row["correo"], row["contrasena"], row["admin"], False)
+            cls(
+                row["correo"],
+                row["contrasena"],
+                row["admin"],
+                False
+            )
             for row in result
         ]
 
     @classmethod
     def get_row(cls, prim_keys: dict) -> object | None:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table, prim_keys)
+        db = DatabaseConnection()
+        result = db.get_row(cls.table, prim_keys)
 
         if not result:
             return None
 
-        return cls(result["correo"], result["contrasena"], result["admin"], False)
+        return cls(
+            result["correo"],
+            result["contrasena"],
+            result["admin"],
+            False
+        )
 
     def save(self) -> bool:
-        # Chequeo bien bobo
+        # Validaciones básicas
         if (
-            type(self.correo) is not str
-            and type(self.contrasena) is not str
-            and type(self.admin) is not bool
+            not isinstance(self.correo, str)
+            or not isinstance(self.contrasena, str)
+            or not isinstance(self.admin, bool)
         ):
             return False
 
-        connection = ConnectionSingleton().get_instance()
+        db = DatabaseConnection()
         if self.is_new:
-            return connection.insert_row(self.table, self.to_dict())
+            success = db.insert_row(
+                self.table,
+                self.to_dict()
+            )
         else:
-            return connection.update_row(
+            success = db.update_row(
                 self.table,
                 self.to_dict(),
                 {"correo": self.correo},
             )
+        return success
 
     def delete_self(self) -> bool:
-        connection = ConnectionSingleton().get_instance()
-        if connection.delete_row(self.table, {"correo": self.correo}):
+        db = DatabaseConnection()
+        success = db.delete_row(self.table, {"correo": self.correo})
+        if success:
             self.correo = None
             self.contrasena = None
             self.admin = None
+        return success

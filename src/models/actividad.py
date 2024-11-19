@@ -1,5 +1,5 @@
 from models.generic_model import GenericModel
-from db import DatabaseConnection
+from db.database_connection import DatabaseConnection
 class Actividad(GenericModel):
     table: str = "actividad"
     id: int

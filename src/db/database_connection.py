@@ -1,4 +1,4 @@
-from db import ConnectionPool
+from db.connection_pool import ConnectionPool
 from config.logger import db_logger as logger
 import mysql.connector
 

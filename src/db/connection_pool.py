@@ -15,7 +15,7 @@ class ConnectionPool:
     def init(cls):
         try:
             cls._pool = mysql.connector.pooling.MySQLConnectionPool(
-                pool_name="malloc_de_esta_no_te_librás",
+                pool_name="malloc_de_esta_no_te_libras",
                 pool_size=5,
                 pool_reset_session=True,
                 user=db_config.USER_BD,
