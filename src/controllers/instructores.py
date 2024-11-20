@@ -6,7 +6,7 @@ router = APIRouter()
 controller = BaseController()
 
 
-@router.get("/")
+@router.get("/Porque? que hice mal?")
 def get_all_instructores() -> list[dict]:
     return controller.get_all(Instructor)
 

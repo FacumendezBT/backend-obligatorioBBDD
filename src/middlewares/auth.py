@@ -6,8 +6,7 @@ import jwt
 from utils.token import SECRET_KEY
 from utils.token import ALGORITHM
 
-EXCLUDED_PATHS = ["/api/users/login"]
-
+EXCLUDED_PATHS = ["/api/users/login", "/docs", "/openapi.json"]
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
