@@ -1,8 +1,6 @@
 from datetime import date
-
-from db.connection_singleton import ConnectionSingleton
 from models.generic_model import GenericModel
-
+from db.database_connection import DatabaseConnection
 
 class Alumno(GenericModel):
     table: str = "alumno"
@@ -44,7 +42,7 @@ class Alumno(GenericModel):
 
     @classmethod
     def from_request(cls, request_data: dict, is_new: bool) -> object:
-        return Alumno(
+        return cls(
             request_data.get("ci"),
             request_data.get("nombre"),
             request_data.get("apellido"),
@@ -56,14 +54,12 @@ class Alumno(GenericModel):
 
     @classmethod
     def get_all(cls) -> list[object]:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_all(cls.table)
-
+        db = DatabaseConnection()
+        result = db.get_all(cls.table)
         if not result:
             return []
-
         return [
-            Alumno(
+            cls(
                 row["ci"],
                 row["nombre"],
                 row["apellido"],
@@ -76,13 +72,11 @@ class Alumno(GenericModel):
         ]
 
     @classmethod
-    def get_row(cls, prim_keys: dict) -> None:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table, prim_keys)
-
+    def get_row(cls, prim_keys: dict) -> object | None:
+        db = DatabaseConnection()
+        result = db.get_row(cls.table, prim_keys)
         if not result:
             return None
-
         return cls(
             result["ci"],
             result["nombre"],
@@ -94,44 +88,42 @@ class Alumno(GenericModel):
         )
 
     def save(self) -> bool:
-        # Chequeo bien bobo
-        if type(self.ci) is not int:
+        # Validaciones básicas
+        if not isinstance(self.ci, int):
+            return False
+        if not isinstance(self.nombre, str):
+            return False
+        if not isinstance(self.apellido, str):
+            return False
+        if not isinstance(self.fecha_nacimiento, date):
+            return False
+        if not isinstance(self.telefono_contacto, int):
+            return False
+        if not isinstance(self.correo_electronico, str):
             return False
 
-        if type(self.nombre) is not str:
-            return False
-
-        if type(self.apellido) is not str:
-            return False
-
-        if type(self.fecha_nacimiento) is not date:
-            return False
-
-        if type(self.telefono_contacto) is not int:
-            return False
-
-        if type(self.correo_electronico) is not str:
-            return False
-
-        connection = ConnectionSingleton().get_instance()
+        db = DatabaseConnection()
         if self.is_new:
-            return connection.insert_row(
+            success = db.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            return connection.update_row(
+            success = db.update_row(
                 self.table,
                 self.to_dict(),
                 {"ci": self.ci},
             )
+        return success
 
     def delete_self(self) -> bool:
-        connection = ConnectionSingleton().get_instance()
-        if connection.delete_row(self.table, {"ci": self.ci}):
+        db = DatabaseConnection()
+        success = db.delete_row(self.table, {"ci": self.ci})
+        if success:
             self.ci = None
             self.nombre = None
             self.apellido = None
             self.fecha_nacimiento = None
             self.telefono_contacto = None
             self.correo_electronico = None
+        return success

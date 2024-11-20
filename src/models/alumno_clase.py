@@ -1,6 +1,5 @@
 from models.generic_model import GenericModel
-from db.connection_singleton import ConnectionSingleton
-
+from db.database_connection import DatabaseConnection
 
 class AlumnoClase(GenericModel):
     table: str = "alumno_clase"
@@ -25,8 +24,8 @@ class AlumnoClase(GenericModel):
         self.is_new = is_new
 
     @classmethod
-    def from_request(self, request_data: dict, is_new: bool) -> object:
-        return AlumnoClase(
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return cls(
             request_data.get("id_clase"),
             request_data.get("ci_alumno"),
             request_data.get("id_equipamiento"),
@@ -35,14 +34,14 @@ class AlumnoClase(GenericModel):
 
     @classmethod
     def get_all(cls) -> list[object]:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_all(cls.table)
+        db = DatabaseConnection()
+        result = db.get_all(cls.table)
 
         if not result:
             return []
 
         return [
-            AlumnoClase(
+            cls(
                 row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
             )
             for row in result
@@ -50,14 +49,14 @@ class AlumnoClase(GenericModel):
 
     @classmethod
     def get_all_with(cls, attributes: dict) -> list[object]:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_all_with(cls.table, attributes)
+        db = DatabaseConnection()
+        result = db.get_all_with(cls.table, attributes)
 
         if not result:
             return []
 
         return [
-            AlumnoClase(
+            cls(
                 row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
             )
             for row in result
@@ -65,8 +64,8 @@ class AlumnoClase(GenericModel):
 
     @classmethod
     def get_row(cls, prim_keys: dict) -> object | None:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table, prim_keys)
+        db = DatabaseConnection()
+        result = db.get_row(cls.table, prim_keys)
 
         if not result:
             return None
@@ -76,34 +75,37 @@ class AlumnoClase(GenericModel):
         )
 
     def save(self) -> bool:
-        # Chequeo bien bobo
-        if type(self.id_clase) is not int:
+        # Validaciones básicas
+        if not isinstance(self.id_clase, int):
             return False
 
-        if type(self.ci_alumno) is not int:
+        if not isinstance(self.ci_alumno, int):
             return False
 
-        if type(self.id_equipamiento) is not int:
+        if not isinstance(self.id_equipamiento, int):
             return False
 
-        connection = ConnectionSingleton().get_instance()
+        db = DatabaseConnection()
         if self.is_new:
-            return connection.insert_row(
+            success = db.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            return connection.update_row(
+            success = db.update_row(
                 self.table,
                 self.to_dict(),
                 {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno},
             )
+        return success
 
     def delete_self(self) -> bool:
-        connection = ConnectionSingleton().get_instance()
-        if connection.delete_row(
+        db = DatabaseConnection()
+        success = db.delete_row(
             self.table, {"id_clase": self.id_clase, "ci_alumno": self.ci_alumno}
-        ):
+        )
+        if success:
             self.id_clase = None
             self.ci_alumno = None
             self.id_equipamiento = None
+        return success

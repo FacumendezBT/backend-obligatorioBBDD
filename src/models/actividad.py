@@ -1,7 +1,5 @@
 from models.generic_model import GenericModel
-from db.connection_singleton import ConnectionSingleton
-
-
+from db.database_connection import DatabaseConnection
 class Actividad(GenericModel):
     table: str = "actividad"
     id: int
@@ -21,20 +19,20 @@ class Actividad(GenericModel):
     def __init__(
         self,
         id: int,
-        description: str,
-        cost: int,
-        age_restrict: int,
+        descripcion: str,
+        costo: int,
+        restricion_edad: int,
         is_new: bool,
     ) -> None:
         self.id = id
-        self.descripcion = description
-        self.costo = cost
-        self.restricion_edad = age_restrict
+        self.descripcion = descripcion
+        self.costo = costo
+        self.restricion_edad = restricion_edad
         self.is_new = is_new
 
     @classmethod
-    def from_request(self, request_data: dict, is_new: bool) -> object:
-        return Actividad(
+    def from_request(cls, request_data: dict, is_new: bool) -> object:
+        return cls(
             request_data.get("id"),
             request_data.get("descripcion"),
             request_data.get("costo"),
@@ -44,14 +42,12 @@ class Actividad(GenericModel):
         
     @classmethod
     def get_all(cls) -> list[object]:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_all(cls.table)
-
+        db = DatabaseConnection()
+        result = db.get_all(cls.table)
         if not result:
             return []
-
         return [
-            Actividad(
+            cls(
                 row["id"],
                 row["descripcion"],
                 row["costo"],
@@ -63,12 +59,10 @@ class Actividad(GenericModel):
 
     @classmethod
     def get_row(cls, prim_keys: dict) -> object | None:
-        connection = ConnectionSingleton().get_instance()
-        result: dict = connection.get_row(cls.table, prim_keys)
-
+        db = DatabaseConnection()
+        result = db.get_row(cls.table, prim_keys)
         if not result:
             return None
-
         return cls(
             result["id"],
             result["descripcion"],
@@ -78,36 +72,36 @@ class Actividad(GenericModel):
         )
 
     def save(self) -> bool:
-        # Chequeo bien bobo
-        if type(self.id) is not int: 
+        # Validaciones básicas
+        if not isinstance(self.id, int): 
+            return False
+        if not isinstance(self.descripcion, str): 
+            return False
+        if not isinstance(self.costo, int): 
+            return False
+        if not isinstance(self.restricion_edad, int): 
             return False
 
-        if type(self.descripcion) is not str: 
-            return False
-
-        if type(self.costo) is not int: 
-            return False
-
-        if type(self.restricion_edad) is not int: 
-            return False
-
-        connection = ConnectionSingleton().get_instance()
+        db = DatabaseConnection()
         if self.is_new:
-            return connection.insert_row(
+            success = db.insert_row(
                 self.table,
                 self.to_dict(),
             )
         else:
-            return connection.update_row(
+            success = db.update_row(
                 self.table,
                 self.to_dict(),
                 {"id": self.id},
             )
+        return success
         
     def delete_self(self) -> bool:
-        connection = ConnectionSingleton().get_instance()
-        if connection.delete_row(self.table, {"id": self.id}):
+        db = DatabaseConnection()
+        success = db.delete_row(self.table, {"id": self.id})
+        if success:
             self.id = None
             self.descripcion = None
             self.costo = None
             self.restricion_edad = None
+        return success
