@@ -6,6 +6,7 @@ import jwt
 from utils.token import SECRET_KEY
 from utils.token import ALGORITHM
 
+
 EXCLUDED_PATHS = ["/api/usuarios/login", "/docs", "/openapi.json"]
 
 
