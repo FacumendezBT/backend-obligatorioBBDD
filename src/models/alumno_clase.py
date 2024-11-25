@@ -1,6 +1,7 @@
 from models.generic_model import GenericModel
 from db.database_connection import DatabaseConnection
 
+
 class AlumnoClase(GenericModel):
     table: str = "alumno_clase"
     id_clase: int
@@ -41,9 +42,7 @@ class AlumnoClase(GenericModel):
             return []
 
         return [
-            cls(
-                row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
-            )
+            cls(row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False)
             for row in result
         ]
 
@@ -56,9 +55,7 @@ class AlumnoClase(GenericModel):
             return []
 
         return [
-            cls(
-                row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False
-            )
+            cls(row["id_clase"], row["ci_alumno"], row["id_equipamiento"], False)
             for row in result
         ]
 

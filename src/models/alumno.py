@@ -2,6 +2,7 @@ from datetime import date
 from models.generic_model import GenericModel
 from db.database_connection import DatabaseConnection
 
+
 class Alumno(GenericModel):
     table: str = "alumno"
     ci: int
@@ -58,6 +59,28 @@ class Alumno(GenericModel):
         result = db.get_all(cls.table)
         if not result:
             return []
+
+        return [
+            cls(
+                row["ci"],
+                row["nombre"],
+                row["apellido"],
+                row["fecha_nacimiento"],
+                row["telefono_contacto"],
+                row["correo_electronico"],
+                False,
+            )
+            for row in result
+        ]
+
+    @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        db = DatabaseConnection()
+        result = db.get_all_with(cls.table, attributes)
+
+        if not result:
+            return []
+
         return [
             cls(
                 row["ci"],

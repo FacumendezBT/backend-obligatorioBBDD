@@ -57,6 +57,25 @@ class Instructor(GenericModel):
         ]
 
     @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        db = DatabaseConnection()
+        result = db.get_all_with(cls.table, attributes)
+
+        if not result:
+            return []
+
+        return [
+            cls(
+                row["ci"],
+                row["nombre"],
+                row["apellido"],
+                row["correo_electronico"],
+                False,
+            )
+            for row in result
+        ]
+
+    @classmethod
     def get_row(cls, prim_keys: dict) -> object | None:
         db = DatabaseConnection()
         result = db.get_row(cls.table, prim_keys)
@@ -88,10 +107,7 @@ class Instructor(GenericModel):
 
         db = DatabaseConnection()
         if self.is_new:
-            success = db.insert_row(
-                self.table,
-                self.to_dict()
-            )
+            success = db.insert_row(self.table, self.to_dict())
         else:
             success = db.update_row(
                 self.table,
