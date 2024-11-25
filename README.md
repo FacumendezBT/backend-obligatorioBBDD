@@ -3,7 +3,7 @@
 ## Con docker
 
 ```
-$ docker build -f dockerfile -t <el nombre que menos te guste>
+$ docker buildx build . -f dockerfile -t <el nombre que menos te guste>
 $ docker run <el nombre que hayas puesto>
 ```  
 
