@@ -4,6 +4,7 @@ from controllers.instructores import router as instructores_router
 from controllers.alumnos import router as alumnos_router
 from controllers.clases import router as clases_router
 from controllers.users import router as users_router
+from middlewares.admin import AdminMiddleware
 from middlewares.auth import AuthMiddleware
 from contextlib import asynccontextmanager
 from db.connection_pool import ConnectionPool
@@ -26,6 +27,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(AdminMiddleware)
 app.add_middleware(AuthMiddleware)
 
 app.include_router(

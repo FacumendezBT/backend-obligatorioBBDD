@@ -6,7 +6,7 @@ class Login(GenericModel):
     table: str = "login"
     correo: str
     contrasena: str
-    admin: bool
+    admin: int
     is_new: bool
 
     def to_dict(self) -> dict:
@@ -16,7 +16,7 @@ class Login(GenericModel):
             "admin": self.admin,
         }
 
-    def __init__(self, correo: str, contrasena: str, admin: bool, is_new: bool) -> None:
+    def __init__(self, correo: str, contrasena: str, admin: int, is_new: bool) -> None:
         self.correo = correo
         self.contrasena = contrasena
         self.admin = admin

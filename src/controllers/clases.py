@@ -8,7 +8,7 @@ controller = BaseController()
 
 
 @router.get("/")
-def get_all_clases() -> list[dict]:
+def get_all_clases(request: Request) -> list[dict]:
     return controller.get_all(Clase)
 
 

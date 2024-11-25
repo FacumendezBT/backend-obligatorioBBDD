@@ -21,7 +21,8 @@ class AuthMiddleware(BaseHTTPMiddleware):
         token = auth_header.split(" ")[1]
 
         try:
-            jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            decoded_token = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            request.state.user = decoded_token
         except jwt.ExpiredSignatureError:
             return JSONResponse(status_code=401, content="Token has expired")
         except jwt.InvalidTokenError:
