@@ -5,7 +5,7 @@ class Actividad(GenericModel):
     id: int
     descripcion: str
     costo: int
-    restricion_edad: int
+    restriccion_edad: int
     is_new: bool
 
     def to_dict(self) -> dict:
@@ -13,7 +13,7 @@ class Actividad(GenericModel):
             "id": self.id,
             "descripcion": self.descripcion,
             "costo": self.costo,
-            "restricion_edad": self.restricion_edad,
+            "restriccion_edad": self.restriccion_edad,
         }
 
     def __init__(
@@ -21,13 +21,13 @@ class Actividad(GenericModel):
         id: int,
         descripcion: str,
         costo: int,
-        restricion_edad: int,
+        restriccion_edad: int,
         is_new: bool,
     ) -> None:
         self.id = id
         self.descripcion = descripcion
         self.costo = costo
-        self.restricion_edad = restricion_edad
+        self.restriccion_edad = restriccion_edad
         self.is_new = is_new
 
     @classmethod
@@ -36,7 +36,7 @@ class Actividad(GenericModel):
             request_data.get("id"),
             request_data.get("descripcion"),
             request_data.get("costo"),
-            request_data.get("restricion_edad"),
+            request_data.get("restriccion_edad"),
             is_new,
         )
         
@@ -51,7 +51,7 @@ class Actividad(GenericModel):
                 row["id"],
                 row["descripcion"],
                 row["costo"],
-                row["restricion_edad"],
+                row["restriccion_edad"],
                 False,
             )
             for row in result
@@ -67,7 +67,7 @@ class Actividad(GenericModel):
             result["id"],
             result["descripcion"],
             result["costo"],
-            result["restricion_edad"],
+            result["restriccion_edad"],
             False,
         )
 
@@ -79,7 +79,7 @@ class Actividad(GenericModel):
             return False
         if not isinstance(self.costo, int): 
             return False
-        if not isinstance(self.restricion_edad, int): 
+        if not isinstance(self.restriccion_edad, int): 
             return False
 
         db = DatabaseConnection()
@@ -103,5 +103,5 @@ class Actividad(GenericModel):
             self.id = None
             self.descripcion = None
             self.costo = None
-            self.restricion_edad = None
+            self.restriccion_edad = None
         return success
