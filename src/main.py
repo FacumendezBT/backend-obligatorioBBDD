@@ -7,6 +7,7 @@ from controllers.users import router as users_router
 from controllers.turnos import router as turnos_router
 from controllers.equipamiento import router as equipamiento_router
 from controllers.actividades import router as actividades_router
+from controllers.reportes import router as reportes_router
 from middlewares.admin import AdminMiddleware
 from middlewares.auth import AuthMiddleware
 from contextlib import asynccontextmanager
@@ -44,3 +45,5 @@ app.include_router(users_router, prefix="/api/usuarios", tags=["Users"])
 app.include_router(turnos_router, prefix="/api/turnos", tags=["Turnos"])
 app.include_router(equipamiento_router, prefix="/api/equipamiento", tags=["Equipamiento"])
 app.include_router(actividades_router, prefix="/api/actividades", tags=["Actividades"])
+app.include_router(reportes_router, prefix="/api/reportes", tags=["Reportes"])
+
