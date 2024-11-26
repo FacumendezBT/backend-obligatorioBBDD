@@ -93,9 +93,6 @@ class Clase(GenericModel):
 
     def save(self) -> bool:
         # Validaciones básicas
-        if not isinstance(self.id, int):
-            return False
-
         if not isinstance(self.ci_instructor, int):
             return False
 
@@ -118,6 +115,9 @@ class Clase(GenericModel):
                 self.to_dict(),
             )
         else:
+            if not isinstance(self.id, int):
+                return False
+
             success = db.update_row(
                 self.table,
                 self.to_dict(),

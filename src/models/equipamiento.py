@@ -73,9 +73,6 @@ class Equipamiento(GenericModel):
 
     def save(self) -> bool:
         # Validaciones básicas
-        if not isinstance(self.id, int):
-            return False
-
         if not isinstance(self.id_actividad, int):
             return False
 
@@ -92,6 +89,9 @@ class Equipamiento(GenericModel):
                 self.to_dict(),
             )
         else:
+            if not isinstance(self.id, int):
+                return False
+
             success = db.update_row(
                 self.table,
                 self.to_dict(),

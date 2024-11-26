@@ -70,8 +70,7 @@ class Turnos(GenericModel):
     def save(self) -> bool:
         # Validaciones básicas
         if (
-            not isinstance(self.id, int)
-            or not isinstance(self.hora_inicio, time)
+            not isinstance(self.hora_inicio, time)
             or not isinstance(self.hora_fin, time)
         ):
             return False
@@ -83,6 +82,9 @@ class Turnos(GenericModel):
                 self.to_dict(),
             )
         else:
+            if not isinstance(self.id, int):
+                return False
+
             success = db.update_row(
                 self.table,
                 self.to_dict(),
