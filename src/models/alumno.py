@@ -110,8 +110,18 @@ class Alumno(GenericModel):
             False,
         )
 
+    def guardar_datos(self):
+        if isinstance(self.fecha_nacimiento, str):
+            try:
+                self.fecha_nacimiento = datetime.strptime(self.fecha_nacimiento, '%Y-%m-%d').date()
+            except ValueError:
+                print("Formato de fecha inválido")
+                return False
+        return True
+
     def save(self) -> bool:
-        # Validaciones básicas
+        if not self.guardar_datos():
+            return False
         if not isinstance(self.ci, int):
             return False
         if not isinstance(self.nombre, str):
