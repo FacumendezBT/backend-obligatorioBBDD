@@ -12,6 +12,8 @@ EXCLUDED_PATHS = ["/api/usuarios/login", "/docs", "/openapi.json"]
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
+        print("pasamos por auth")
+        print("Request Headers:", request.headers)
         if request.url.path in EXCLUDED_PATHS:
             return await call_next(request)
 
@@ -29,4 +31,5 @@ class AuthMiddleware(BaseHTTPMiddleware):
         except jwt.InvalidTokenError:
             return JSONResponse(status_code=401, content="Invalid token")
 
+        print("Request Headers:", request.headers)
         return await call_next(request)
