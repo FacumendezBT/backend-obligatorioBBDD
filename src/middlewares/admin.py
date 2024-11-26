@@ -8,8 +8,6 @@ EXCLUDED_PATHS = ["/api/usuarios/login", "/docs", "/openapi.json"]
 
 class AdminMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next) -> Response:
-        print("pasamos por admin")
-        print("Request Headers:", request.headers)
         if request.url.path in EXCLUDED_PATHS:
             return await call_next(request)
 
@@ -18,5 +16,4 @@ class AdminMiddleware(BaseHTTPMiddleware):
                 status_code=401, content="Administrator rights are needed."
             )
 
-        print("Request Headers:", request.headers)
         return await call_next(request)

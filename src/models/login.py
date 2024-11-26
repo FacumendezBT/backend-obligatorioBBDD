@@ -69,7 +69,7 @@ class Login(GenericModel):
         if (
             not isinstance(self.correo, str)
             or not isinstance(self.contrasena, str)
-            or not isinstance(self.admin, bool)
+            or not isinstance(self.admin, int)
         ):
             return False
 
