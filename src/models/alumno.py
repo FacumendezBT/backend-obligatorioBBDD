@@ -143,7 +143,6 @@ class Alumno(GenericModel):
                 self.to_dict(),
             )
         else:
-            print("AJAJJAJAJAJA")
             success = db.update_row(
                 self.table,
                 self.to_dict(),
