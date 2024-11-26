@@ -71,6 +71,25 @@ class Equipamiento(GenericModel):
             False,
         )
 
+    @classmethod
+    def get_all_with(cls, attributes: dict) -> list[object]:
+        db = DatabaseConnection()
+        result = db.get_all_with(cls.table, attributes)
+
+        if not result:
+            return []
+
+        return [
+            cls(
+                row["id"],
+                row["id_actividad"],
+                row["descripcion"],
+                row["costo"],
+                False,
+            )
+            for row in result
+        ]
+
     def save(self) -> bool:
         # Validaciones básicas
         if not isinstance(self.id_actividad, int):
