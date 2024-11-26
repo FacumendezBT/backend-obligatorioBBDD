@@ -68,16 +68,16 @@ CREATE TABLE alumno
 CREATE TABLE clase
 (
     id            INT AUTO_INCREMENT,
-    ci_instructor INT     NOT NULL,
+    ci_instructor INT,
     id_actividad  INT     NOT NULL,
-    id_turno      INT     NOT NULL,
+    id_turno      INT,
     dictada       BOOLEAN NOT NULL,
     fecha         DATE    NOT NULL,
 
     PRIMARY KEY (id),
-    FOREIGN KEY (ci_instructor) REFERENCES instructor (ci),
+    FOREIGN KEY (ci_instructor) REFERENCES instructor (ci) ON DELETE SET NULL ,
     FOREIGN KEY (id_actividad) REFERENCES actividad (id),
-    FOREIGN KEY (id_turno) REFERENCES turnos (id)
+    FOREIGN KEY (id_turno) REFERENCES turnos (id) ON DELETE SET NULL
 );
 
 CREATE TABLE alumno_clase
