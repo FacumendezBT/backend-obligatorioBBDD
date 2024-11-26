@@ -11,6 +11,9 @@ class AdminMiddleware(BaseHTTPMiddleware):
         if request.url.path in EXCLUDED_PATHS:
             return await call_next(request)
 
+        if request.method == "GET":
+            return await call_next(request)
+
         if request.state.user.get("admin") != 1:
             return JSONResponse(
                 status_code=401, content="Administrator rights are needed."

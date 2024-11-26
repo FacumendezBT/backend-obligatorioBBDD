@@ -1,6 +1,7 @@
 from models.generic_model import GenericModel
 from db.database_connection import DatabaseConnection
 from datetime import time
+from utils.time import convertir_a_time
 
 
 class Turnos(GenericModel):
@@ -68,14 +69,18 @@ class Turnos(GenericModel):
         )
 
     def save(self) -> bool:
+        self.hora_inicio = convertir_a_time(self.hora_inicio)
+        self.hora_fin = convertir_a_time(self.hora_fin)
         # Validaciones básicas
         if (
             not isinstance(self.hora_inicio, time)
             or not isinstance(self.hora_fin, time)
         ):
+            print("ACA")
             return False
 
         db = DatabaseConnection()
+
         if self.is_new:
             success = db.insert_row(
                 self.table,
@@ -83,6 +88,7 @@ class Turnos(GenericModel):
             )
         else:
             if not isinstance(self.id, int):
+                print("ACA2")
                 return False
 
             success = db.update_row(
