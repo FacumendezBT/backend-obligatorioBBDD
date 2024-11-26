@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import datetime
 from models.generic_model import GenericModel
 from db.database_connection import DatabaseConnection
 
@@ -130,7 +131,7 @@ class Alumno(GenericModel):
             return False
         if not isinstance(self.fecha_nacimiento, date):
             return False
-        if not isinstance(self.telefono_contacto, int):
+        if not isinstance(self.telefono_contacto, str):
             return False
         if not isinstance(self.correo_electronico, str):
             return False
@@ -142,6 +143,7 @@ class Alumno(GenericModel):
                 self.to_dict(),
             )
         else:
+            print("AJAJJAJAJAJA")
             success = db.update_row(
                 self.table,
                 self.to_dict(),
